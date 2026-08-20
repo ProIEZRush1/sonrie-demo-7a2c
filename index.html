@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sonríe Mx · Sistema de agenda — demostración Overcloud</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#0f172a;      /* su azul pizarra */
+  --tinta-2:#1e293b;
+  --tinta-3:#334155;
+  --oro:#eab308;        /* su dorado */
+  --oro-claro:#fde68a;
+  --hueso:#f8fafc;
+  --gris:#94a3b8;
+  --verde:#25d366;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --texto:"Jost",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--tinta);color:var(--hueso);font-family:var(--texto);
+  font-weight:300;line-height:1.65;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.env{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ---------- barra de contexto ---------- */
+.aviso{
+  background:linear-gradient(90deg,#1d4ed8,#7c3aed,#db2777);
+  font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;
+  text-align:center;padding:9px 16px;font-weight:500;
+}
+.aviso b{font-weight:600}
+
+/* ---------- encabezado ---------- */
+header{padding:26px 0;border-bottom:1px solid rgba(234,179,8,.16)}
+.head{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.marca{display:flex;align-items:center;gap:13px}
+.sello{
+  width:44px;height:44px;border-radius:50%;flex:none;
+  border:1.5px solid var(--oro);display:grid;place-items:center;
+  font-family:var(--display);font-size:1.35rem;color:var(--oro);
+}
+.marca h1{font-family:var(--display);font-size:1.5rem;font-weight:600;letter-spacing:.02em}
+.marca span{display:block;font-size:.66rem;letter-spacing:.3em;color:var(--oro);text-transform:uppercase;font-weight:400}
+nav{display:flex;gap:26px;font-size:.85rem;color:var(--gris);flex-wrap:wrap}
+nav a{color:inherit;text-decoration:none;transition:color .2s}
+nav a:hover{color:var(--oro)}
+
+/* ---------- portada ---------- */
+.portada{padding:88px 0 70px;position:relative}
+.portada::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 55% at 78% 18%,rgba(234,179,8,.10),transparent 62%);
+}
+.portada .env{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.kicker{font-size:.72rem;letter-spacing:.34em;color:var(--oro);text-transform:uppercase;margin-bottom:20px}
+.portada h2{font-family:var(--display);font-size:clamp(2.5rem,5.4vw,4rem);font-weight:300;line-height:1.08;letter-spacing:-.01em}
+.portada h2 em{font-style:italic;color:var(--oro)}
+.portada p{color:#cbd5e1;margin-top:22px;max-width:46ch;font-size:1.02rem}
+.datos{display:flex;gap:36px;margin-top:38px;flex-wrap:wrap}
+.dato b{display:block;font-family:var(--display);font-size:2.1rem;color:var(--oro);line-height:1;font-weight:600}
+.dato span{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gris)}
+
+/* ---------- reservador ---------- */
+.tarjeta{
+  background:linear-gradient(160deg,#182338,#0f172a);
+  border:1px solid rgba(234,179,8,.2);border-radius:18px;
+  padding:30px;box-shadow:0 26px 60px -28px rgba(0,0,0,.85);
+}
+.tarjeta h3{font-family:var(--display);font-size:1.5rem;font-weight:600;margin-bottom:4px}
+.tarjeta .sub{font-size:.82rem;color:var(--gris);margin-bottom:22px}
+.pasos{display:flex;gap:6px;margin-bottom:24px}
+.paso{flex:1;height:3px;border-radius:2px;background:rgba(148,163,184,.22);transition:background .35s}
+.paso.on{background:var(--oro)}
+.campo{margin-bottom:18px}
+.campo label{display:block;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gris);margin-bottom:9px}
+.ops{display:flex;flex-wrap:wrap;gap:8px}
+.op{
+  border:1px solid rgba(148,163,184,.28);background:transparent;color:#e2e8f0;
+  padding:9px 14px;border-radius:9px;font:inherit;font-size:.85rem;cursor:pointer;transition:all .18s;
+}
+.op:hover{border-color:var(--oro);color:var(--oro-claro)}
+.op[aria-pressed="true"]{background:var(--oro);border-color:var(--oro);color:var(--tinta);font-weight:500}
+.horas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hora{
+  border:1px solid rgba(148,163,184,.28);background:transparent;color:#e2e8f0;
+  padding:10px 4px;border-radius:9px;font:inherit;font-size:.82rem;cursor:pointer;text-align:center;transition:all .18s;
+}
+.hora:hover:not(:disabled){border-color:var(--oro);color:var(--oro-claro)}
+.hora[aria-pressed="true"]{background:var(--oro);border-color:var(--oro);color:var(--tinta);font-weight:500}
+.hora:disabled{opacity:.28;cursor:not-allowed;text-decoration:line-through}
+.cta{
+  width:100%;margin-top:8px;padding:15px;border:0;border-radius:11px;cursor:pointer;
+  background:var(--oro);color:var(--tinta);font:inherit;font-weight:600;font-size:.96rem;
+  letter-spacing:.02em;transition:filter .18s,transform .18s;
+}
+.cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.cta:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.exito{text-align:center;padding:14px 0}
+.palomita{
+  width:56px;height:56px;border-radius:50%;background:rgba(37,211,102,.14);
+  border:1.5px solid var(--verde);display:grid;place-items:center;margin:0 auto 16px;
+  font-size:1.6rem;color:var(--verde);
+}
+.exito h4{font-family:var(--display);font-size:1.5rem;font-weight:600;margin-bottom:8px}
+.exito p{font-size:.9rem;color:#cbd5e1}
+.resumen{
+  margin:18px 0;padding:14px;border-radius:10px;background:rgba(148,163,184,.08);
+  font-size:.86rem;text-align:left;
+}
+.resumen div{display:flex;justify-content:space-between;padding:4px 0;gap:14px}
+.resumen span:first-child{color:var(--gris)}
+.otra{background:transparent;border:1px solid rgba(148,163,184,.3);color:var(--gris);
+  padding:9px 16px;border-radius:9px;font:inherit;font-size:.82rem;cursor:pointer}
+.otra:hover{border-color:var(--oro);color:var(--oro)}
+
+/* ---------- secciones ---------- */
+section{padding:78px 0}
+.st{text-align:center;margin-bottom:52px}
+.st h3{font-family:var(--display);font-size:clamp(1.9rem,3.6vw,2.7rem);font-weight:300;line-height:1.15}
+.st h3 em{font-style:italic;color:var(--oro)}
+.st p{color:var(--gris);margin-top:14px;font-size:.98rem;max-width:60ch;margin-inline:auto}
+.franja{background:var(--tinta-2)}
+
+/* teléfono */
+.duo{display:grid;grid-template-columns:.85fr 1.15fr;gap:56px;align-items:center}
+.tel{
+  width:288px;margin:0 auto;background:#0b1220;border:9px solid #1e293b;border-radius:34px;
+  padding:16px 13px;box-shadow:0 26px 55px -22px rgba(0,0,0,.9);
+}
+.telbar{display:flex;align-items:center;gap:9px;padding-bottom:12px;border-bottom:1px solid rgba(148,163,184,.14);margin-bottom:13px}
+.telav{width:32px;height:32px;border-radius:50%;background:var(--oro);color:var(--tinta);display:grid;place-items:center;font-family:var(--display);font-weight:600;font-size:.95rem}
+.telbar b{font-size:.82rem;font-weight:500}
+.telbar small{display:block;font-size:.64rem;color:var(--verde)}
+.burb{
+  background:#1f2c3f;padding:11px 13px;border-radius:12px 12px 12px 3px;
+  font-size:.79rem;line-height:1.5;margin-bottom:9px;color:#e2e8f0;
+}
+.burb.mia{background:#0d5c3f;border-radius:12px 12px 3px 12px;margin-left:34px}
+.burb b{font-weight:600}
+.burb .hr{display:block;text-align:right;font-size:.6rem;color:rgba(255,255,255,.45);margin-top:3px}
+.btns{display:flex;gap:6px;margin:9px 0 0}
+.btnw{flex:1;background:#1f2c3f;border:1px solid rgba(37,211,102,.4);color:var(--verde);
+  padding:8px;border-radius:9px;font-size:.72rem;text-align:center}
+
+.lista{list-style:none;display:grid;gap:20px}
+.lista li{display:flex;gap:15px;align-items:flex-start}
+.num{
+  flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--oro);
+  color:var(--oro);display:grid;place-items:center;font-size:.8rem;font-weight:500;
+}
+.lista b{display:block;font-weight:500;margin-bottom:3px;font-size:1rem}
+.lista p{color:var(--gris);font-size:.9rem}
+
+/* panel */
+.panel{
+  background:#0b1220;border:1px solid rgba(148,163,184,.16);border-radius:15px;overflow:hidden;
+  box-shadow:0 24px 55px -26px rgba(0,0,0,.9);
+}
+.panel-top{display:flex;align-items:center;gap:8px;padding:13px 18px;background:#111c30;border-bottom:1px solid rgba(148,163,184,.14)}
+.luz{width:10px;height:10px;border-radius:50%}
+.panel-top b{margin-left:10px;font-size:.82rem;font-weight:500;color:#cbd5e1}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(148,163,184,.14)}
+.kpi{background:#0b1220;padding:18px 16px}
+.kpi b{display:block;font-family:var(--display);font-size:1.85rem;color:var(--oro);line-height:1.1;font-weight:600}
+.kpi span{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gris)}
+.kpi.verde b{color:var(--verde)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+th{
+  text-align:left;padding:11px 16px;font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gris);font-weight:500;border-bottom:1px solid rgba(148,163,184,.14);
+}
+td{padding:12px 16px;border-bottom:1px solid rgba(148,163,184,.07);color:#e2e8f0}
+tr:last-child td{border-bottom:0}
+.tag{padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:500;white-space:nowrap}
+.ok{background:rgba(37,211,102,.14);color:var(--verde)}
+.esp{background:rgba(234,179,8,.14);color:var(--oro)}
+.no{background:rgba(148,163,184,.14);color:var(--gris)}
+
+/* cierre */
+.cierre{text-align:center;padding:84px 0}
+.cierre h3{font-family:var(--display);font-size:clamp(2rem,4vw,2.9rem);font-weight:300;line-height:1.15;margin-bottom:18px}
+.cierre h3 em{font-style:italic;color:var(--oro)}
+.cierre p{color:var(--gris);max-width:58ch;margin:0 auto 30px}
+.wa{
+  display:inline-flex;align-items:center;gap:10px;background:var(--verde);color:#04291a;
+  padding:15px 30px;border-radius:11px;text-decoration:none;font-weight:600;font-size:1rem;
+  transition:filter .18s,transform .18s;
+}
+.wa:hover{filter:brightness(1.08);transform:translateY(-1px)}
+footer{border-top:1px solid rgba(148,163,184,.14);padding:32px 0;font-size:.8rem;color:var(--gris);text-align:center}
+footer b{color:var(--oro-claro);font-weight:500}
+footer a{color:var(--oro);text-decoration:none}
+
+@media(max-width:900px){
+  .portada .env,.duo{grid-template-columns:1fr;gap:40px}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .oculta-movil{display:none}
+  nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="aviso">Demostración construida por <b>Overcloud</b> para Clínica Dental Sonríe&nbsp;Mx · No es su sitio real</div>
+
+<header>
+  <div class="env head">
+    <div class="marca">
+      <div class="sello">S</div>
+      <div>
+        <h1>Sonríe Mx</h1>
+        <span>Clínica Dental</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#agenda">Agendar</a>
+      <a href="#recordatorios">Recordatorios</a>
+      <a href="#panel">Panel</a>
+      <a href="#cierre">Overcloud</a>
+    </nav>
+  </div>
+</header>
+
+<div class="portada" id="agenda">
+  <div class="env">
+    <div>
+      <div class="kicker">Así se vería su agenda en línea</div>
+      <h2>Su paciente reserva<br><em>a las once de la noche.</em></h2>
+      <p>Sin llamar, sin esperar a que alguien conteste, sin perder la intención. Elige tratamiento, especialista y hora — y el consultorio se entera solo.</p>
+      <div class="datos">
+        <div class="dato"><b>9</b><span>Especialistas</span></div>
+        <div class="dato"><b>24/7</b><span>Agenda abierta</span></div>
+        <div class="dato"><b>0</b><span>Llamadas</span></div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Agenda tu cita</h3>
+      <div class="sub">Toma menos de un minuto — pruébelo.</div>
+      <div class="pasos">
+        <div class="paso on" data-p="1"></div>
+        <div class="paso" data-p="2"></div>
+        <div class="paso" data-p="3"></div>
+      </div>
+
+      <div id="form">
+        <div class="campo">
+          <label>1 · Tratamiento</label>
+          <div class="ops" id="serv">
+            <button class="op" data-v="Odontología General">Odontología General</button>
+            <button class="op" data-v="Ortodoncia">Ortodoncia</button>
+            <button class="op" data-v="Endodoncia">Endodoncia</button>
+            <button class="op" data-v="Odontología Estética">Estética</button>
+            <button class="op" data-v="Periodoncia">Periodoncia</button>
+            <button class="op" data-v="Implantología">Implantología</button>
+            <button class="op" data-v="Odontopediatría">Odontopediatría</button>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label>2 · Especialista</label>
+          <div class="ops" id="esp"></div>
+        </div>
+
+        <div class="campo">
+          <label>3 · Horario disponible <span id="dia" style="color:#64748b"></span></label>
+          <div class="horas" id="horas"></div>
+        </div>
+
+        <button class="cta" id="btn" disabled>Confirmar cita</button>
+      </div>
+
+      <div id="listo" style="display:none">
+        <div class="exito">
+          <div class="palomita">✓</div>
+          <h4>Cita confirmada</h4>
+          <p>Se envió el comprobante por WhatsApp.</p>
+          <div class="resumen" id="resumen"></div>
+          <button class="otra" id="otra">Agendar otra</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="franja" id="recordatorios">
+  <div class="env">
+    <div class="st">
+      <h3>El recordatorio que <em>nadie tiene que mandar</em></h3>
+      <p>Veinticuatro horas antes, el sistema escribe solo. El paciente confirma o reagenda desde ahí mismo, y la agenda se actualiza sin que nadie mueva un dedo.</p>
+    </div>
+    <div class="duo">
+      <div class="tel">
+        <div class="telbar">
+          <div class="telav">S</div>
+          <div><b>Sonríe Mx</b><small>en línea</small></div>
+        </div>
+        <div class="burb">
+          Hola Mariana 👋 Le recordamos su cita en <b>Sonríe Mx</b>:<br><br>
+          🦷 Endodoncia<br>
+          👩‍⚕️ Dra. Ammy Solache<br>
+          📅 Mañana, 11:30 a.m.<br><br>
+          ¿La confirmamos?
+          <span class="hr">10:00 a.m.</span>
+        </div>
+        <div class="btns">
+          <div class="btnw">Confirmar</div>
+          <div class="btnw">Reagendar</div>
+        </div>
+        <div class="burb mia" style="margin-top:12px">Confirmada, ahí estaré<span class="hr">10:04 a.m. ✓✓</span></div>
+        <div class="burb">Perfecto. La esperamos 🦷<span class="hr">10:04 a.m.</span></div>
+      </div>
+      <div>
+        <ul class="lista">
+          <li><span class="num">1</span><div><b>Sale solo, siempre</b><p>No depende de que alguien se acuerde entre paciente y paciente.</p></div></li>
+          <li><span class="num">2</span><div><b>El paciente reagenda sin llamar</b><p>Si no puede, elige otro horario ahí mismo. Esa hora se libera y otro paciente la toma.</p></div></li>
+          <li><span class="num">3</span><div><b>Usted ve quién confirmó</b><p>Antes de que empiece el día ya sabe cuáles citas son seguras y cuáles conviene rellenar.</p></div></li>
+          <li><span class="num">4</span><div><b>El que no volvió, regresa</b><p>Si un paciente lleva seis meses sin venir a limpieza, el sistema le escribe. Solo.</p></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="panel">
+  <div class="env">
+    <div class="st">
+      <h3>Y usted abre el teléfono y <em>ve el día completo</em></h3>
+      <p>Quién viene, con qué especialista, quién ya confirmó y cuánto se espera cobrar. En una sola pantalla, no en cinco lugares distintos.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-top">
+        <span class="luz" style="background:#ef4444"></span>
+        <span class="luz" style="background:#eab308"></span>
+        <span class="luz" style="background:#22c55e"></span>
+        <b>Panel Sonríe Mx · Agenda de hoy</b>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><b>14</b><span>Citas hoy</span></div>
+        <div class="kpi verde"><b>11</b><span>Confirmadas</span></div>
+        <div class="kpi"><b>2</b><span>Sin respuesta</span></div>
+        <div class="kpi"><b>$28,400</b><span>Esperado</span></div>
+      </div>
+      <table>
+        <thead><tr><th>Hora</th><th>Paciente</th><th class="oculta-movil">Tratamiento</th><th class="oculta-movil">Especialista</th><th>Estado</th></tr></thead>
+        <tbody>
+          <tr><td>09:00</td><td>Mariana Ríos</td><td class="oculta-movil">Endodoncia</td><td class="oculta-movil">Dra. Ammy Solache</td><td><span class="tag ok">Confirmada</span></td></tr>
+          <tr><td>10:00</td><td>Jorge Lemus</td><td class="oculta-movil">Ortodoncia · ajuste</td><td class="oculta-movil">Dra. Daniela Lobato</td><td><span class="tag ok">Confirmada</span></td></tr>
+          <tr><td>11:30</td><td>Paola Cárdenas</td><td class="oculta-movil">Limpieza</td><td class="oculta-movil">Dra. Daniela Reyes</td><td><span class="tag esp">Sin responder</span></td></tr>
+          <tr><td>12:30</td><td>Luis Ontiveros</td><td class="oculta-movil">Implante · 2ª fase</td><td class="oculta-movil">Dr. Héctor Robles</td><td><span class="tag ok">Confirmada</span></td></tr>
+          <tr><td>16:00</td><td>Regina Ávalos</td><td class="oculta-movil">Carillas · valoración</td><td class="oculta-movil">Dr. Louis Jasso</td><td><span class="tag ok">Confirmada</span></td></tr>
+          <tr><td>17:00</td><td>—</td><td class="oculta-movil">Hora libre</td><td class="oculta-movil">—</td><td><span class="tag no">Disponible</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="cierre" id="cierre">
+  <div class="env">
+    <h3>Su sitio ya se ve bien.<br>Lo que falta está <em>detrás del botón.</em></h3>
+    <p>Hoy "Agenda tu cita" abre una conversación que alguien tiene que contestar. Esto es lo mismo, pero que se agenda solo, recuerda solo y le deja el registro a usted. Se instala sobre lo que ya tienen, sin rehacer su sitio.</p>
+    <a class="wa" href="https://wa.me/5215594356241?text=Hola%20Andr%C3%A9s%2C%20vi%20la%20demostraci%C3%B3n%20de%20Sonr%C3%ADe%20Mx" target="_blank" rel="noopener">Hablar con Overcloud por WhatsApp</a>
+  </div>
+</div>
+
+<footer>
+  <div class="env">
+    Demostración sin costo preparada por <b>Overcloud</b> para Clínica Dental Sonríe&nbsp;Mx.<br>
+    Los pacientes, horarios y montos son ilustrativos. Los nombres de especialistas y tratamientos
+    se tomaron de su sitio público para que la vea en su contexto.<br>
+    <a href="https://overcloud.us" target="_blank" rel="noopener">overcloud.us</a>
+  </div>
+</footer>
+
+<script>
+// Especialistas reales tomados de su sitio, asignados a su área.
+const EQUIPO = {
+  "Odontología General": ["Dra. Daniela Reyes","Dra. Valeria Ceballos","Dr. Louis Jasso"],
+  "Ortodoncia":          ["Dra. Daniela Lobato","Dra. Mariana Argaez"],
+  "Endodoncia":          ["Dra. Ammy Solache","Dr. Giovanni Pérez"],
+  "Odontología Estética":["Dr. Louis Jasso","Dra. Mariana Argaez"],
+  "Periodoncia":         ["Dra. Daniela Lobato"],
+  "Implantología":       ["Dr. Héctor Robles"],
+  "Odontopediatría":     ["Dra. Valeria Ceballos","Dra. Daniela Reyes"]
+};
+const HORAS = ["09:00","10:00","11:00","12:00","13:00","16:00","17:00","18:00"];
+// Horas ocupadas fijas: la demo debe verse igual cada vez que la abran.
+const OCUPADAS = ["11:00","13:00","17:00"];
+
+const el = id => document.getElementById(id);
+let sel = { serv:null, esp:null, hora:null };
+
+function marcarPasos(){
+  const n = (sel.serv?1:0) + (sel.esp?1:0) + (sel.hora?1:0);
+  document.querySelectorAll('.paso').forEach(p => p.classList.toggle('on', +p.dataset.p <= Math.max(n,1)));
+  el('btn').disabled = !(sel.serv && sel.esp && sel.hora);
+}
+
+function pintarEsp(){
+  const cont = el('esp');
+  cont.innerHTML = '';
+  if(!sel.serv){ cont.innerHTML = '<span style="font-size:.82rem;color:#64748b">Elija primero un tratamiento</span>'; return; }
+  EQUIPO[sel.serv].forEach(nombre => {
+    const b = document.createElement('button');
+    b.className = 'op'; b.textContent = nombre; b.dataset.v = nombre;
+    b.setAttribute('aria-pressed', sel.esp === nombre);
+    b.onclick = () => { sel.esp = nombre; sel.hora = null; pintarEsp(); pintarHoras(); marcarPasos(); };
+    cont.appendChild(b);
+  });
+}
+
+function pintarHoras(){
+  const cont = el('horas');
+  cont.innerHTML = '';
+  HORAS.forEach(h => {
+    const b = document.createElement('button');
+    b.className = 'hora'; b.textContent = h;
+    b.disabled = !sel.esp || OCUPADAS.includes(h);
+    b.setAttribute('aria-pressed', sel.hora === h);
+    b.onclick = () => { sel.hora = h; pintarHoras(); marcarPasos(); };
+    cont.appendChild(b);
+  });
+}
+
+document.querySelectorAll('#serv .op').forEach(b => {
+  b.onclick = () => {
+    sel.serv = b.dataset.v; sel.esp = null; sel.hora = null;
+    document.querySelectorAll('#serv .op').forEach(o => o.setAttribute('aria-pressed', o === b));
+    pintarEsp(); pintarHoras(); marcarPasos();
+  };
+});
+
+// Fecha de mañana, en español y en horario de México.
+const manana = new Date(Date.now() + 86400000);
+const fechaTxt = manana.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long', timeZone:'America/Mexico_City' });
+el('dia').textContent = '· ' + fechaTxt;
+
+el('btn').onclick = () => {
+  el('resumen').innerHTML = `
+    <div><span>Tratamiento</span><span>${sel.serv}</span></div>
+    <div><span>Especialista</span><span>${sel.esp}</span></div>
+    <div><span>Fecha</span><span>${fechaTxt}</span></div>
+    <div><span>Hora</span><span>${sel.hora}</span></div>`;
+  el('form').style.display = 'none';
+  el('listo').style.display = 'block';
+};
+el('otra').onclick = () => {
+  sel = { serv:null, esp:null, hora:null };
+  document.querySelectorAll('#serv .op').forEach(o => o.setAttribute('aria-pressed', false));
+  pintarEsp(); pintarHoras(); marcarPasos();
+  el('listo').style.display = 'none';
+  el('form').style.display = 'block';
+};
+
+pintarEsp(); pintarHoras(); marcarPasos();
+</script>
+</body>
+</html>
